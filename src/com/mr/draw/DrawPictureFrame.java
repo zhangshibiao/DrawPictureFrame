@@ -29,6 +29,11 @@ import com.mr.util.DrawImageUtil;
 import java.awt.AlphaComposite;
 import java.awt.Font;
 import javax.swing.JOptionPane;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.Cursor;
+
 
 public class DrawPictureFrame extends JFrame implements FrameGetShape {
 	//创建一个8位BGR颜色分量的图像；
@@ -166,6 +171,21 @@ public class DrawPictureFrame extends JFrame implements FrameGetShape {
 				y=e.getY();//上一次鼠标绘制点的纵坐标；
 				canvas.repaint();//更新画布
 			}
+			public void mouseMoved(final MouseEvent e) {//当鼠标移动时
+				if(rubber) {//如果使用橡皮
+					//设置鼠标指针的形状为图片
+					Toolkit kit=Toolkit.getDefaultToolkit();//获得系统默认的组件工具包
+					//利用工具包获取图片
+					Image img=kit.createImage("src/img/icon/鼠标橡皮.png");
+					//可用工具包创建一个自定义的光标对象
+					//参数为图片，光标热点（写成0，0就行)和光标描述字符串
+					Cursor c=kit.createCustomCursor(img,new Point(0,0),"clear");
+					setCursor(c);//使用自定义的光标对象
+				}else {
+					//设置鼠标指针的形状为十字光标
+					setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+				}
+			}
 		});
 		canvas.addMouseListener(new MouseAdapter() {//画板添加鼠标单击事件监听
 			public void mouseReleased(final MouseEvent arg0) {//当按键抬起时
@@ -198,7 +218,12 @@ public class DrawPictureFrame extends JFrame implements FrameGetShape {
 				}
 			}
 		});
-		
+		toolBar.addMouseMotionListener(new MouseMotionAdapter(){//工具栏添加鼠标移动监听
+			public void mouseMoved(final MouseEvent arg0) {//当鼠标移动时
+				//设置鼠标指针的形状为默认光标
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
+		});
 	
 		strokeButton1.addActionListener(new ActionListener() {//细线按钮添加动作监听
 			public void actionPerformed(final ActionEvent arg0) {//单击时
