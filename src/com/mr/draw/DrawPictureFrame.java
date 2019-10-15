@@ -41,7 +41,7 @@ public class DrawPictureFrame extends JFrame implements FrameGetShape {
 	Graphics gs=image.getGraphics();//获得图像的绘图对象；
 	Graphics2D g=(Graphics2D) gs;//将绘图对象转换为Graphics2D类型；
 	DrawPictureCanvas canvas=new DrawPictureCanvas();//创建画布对象；
-	Color foreColor=Color.BLACK;//定义前景色;0
+	Color foreColor=Color.BLACK;//定义前景色;
 	Color backgroundColor=Color.WHITE;//定义背景色；
 	int x=-1;
 	int y=-1;
@@ -69,6 +69,8 @@ public class DrawPictureFrame extends JFrame implements FrameGetShape {
 	private JMenuItem saveMenuItem;//细线菜单
 	private JMenuItem shuiyinMenuItem;//水印菜单
 	private String shuiyin="";
+	private PictureWindow picturewindow;//简笔画展示窗体
+	private JButton showPicButton;//展开简笔画按钮
 	
 	public DrawPictureFrame() {
 		setResizable(false); // 窗体不能改变大小
@@ -89,6 +91,8 @@ public class DrawPictureFrame extends JFrame implements FrameGetShape {
 		getContentPane().add(canvas);//将画布添加到窗体容器默认布局的中部位置；
 		toolBar=new JToolBar();//初始化工具栏；
 		getContentPane().add(toolBar,BorderLayout.NORTH);//工具栏添加到窗体最北的位置；
+		showPicButton=new JButton("展开简笔画");//初始化按钮对象，并添加文本内容
+		toolBar.add(showPicButton);//工具栏添加按钮
 		saveButton=new JButton("保存");
 		toolBar.add(saveButton);//工具栏添加按钮;
 		toolBar.addSeparator();//添加分割条；
@@ -150,6 +154,9 @@ public class DrawPictureFrame extends JFrame implements FrameGetShape {
 		editMenu.add(clearMenuItem);
 		eraserMenuItem=new JMenuItem("清除");
 		editMenu.add(eraserMenuItem);
+		
+		//创建简笔画展示面板，并将本类当做他的父窗体
+		picturewindow=new PictureWindow(DrawPictureFrame.this);
 		
 		}
 	/*
@@ -412,7 +419,30 @@ public class DrawPictureFrame extends JFrame implements FrameGetShape {
 				}
 			}
 		});		
+		showPicButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean isVisible=picturewindow.isVisible();//获取简笔画展示窗体可见状态
+				if(isVisible) {//如果简笔画展示窗体是可见的
+					showPicButton.setText("展开简笔画");//修改按钮的文本
+					picturewindow.setVisible(false);//隐藏简笔画展示窗体
+				}else {
+					showPicButton.setText("隐藏简笔画");
+					//更新指定简笔画展示窗体的显示位置
+					//横坐标=主窗体横坐标-简笔画窗体宽度-5
+					//纵坐标=主窗体纵坐标
+					picturewindow.setLocation(getX()-picturewindow.getWidth()-5,getY());
+					picturewindow.setVisible(true);//简笔画展示窗体可见
+				}
+			}
+		});
 	}
+	/**
+	 * 恢复展开简笔画按钮的文本内容，此方法共简笔画面板的“隐藏”按钮调用
+	 */
+	public void initShowPicButton() {
+		showPicButton.setText("展开简笔画");//修改按钮的文本
+	}
+	
 	/*
 	 * FrameGetShape接口实现类，用于获得图形控件返回的被选中的图形
 	 */
@@ -443,6 +473,7 @@ public class DrawPictureFrame extends JFrame implements FrameGetShape {
 		DrawPictureFrame frame = new DrawPictureFrame();
 		frame.setVisible(true);// 让窗体可见；
 	}
+	
 	@Override
 	public void getShape(Shapes shape) {
 		// TODO Auto-generated method stub
